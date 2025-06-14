@@ -17,7 +17,7 @@ GOOS=darwin GOARCH=arm64 go build -o bson2json-macos-arm64 ./cmd/bson2json
 ## Features
 - Supports BSON files and gzip-compressed BSON files
 - Outputs JSON to stdout
-- Handles single or multiple BSON documents (if implemented)
+
 
 ## License
 MIT
