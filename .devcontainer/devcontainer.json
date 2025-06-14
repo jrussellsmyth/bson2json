@@ -1,0 +1,20 @@
+{
+    "name": "Go CLI DevContainer",
+    "image": "mcr.microsoft.com/devcontainers/go:1.22",
+    "features": {
+        "ghcr.io/devcontainers/features/go:1": {
+            "version": "1.22"
+        }
+    },
+    "postCreateCommand": "go mod tidy",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "golang.Go"
+            ],
+            "settings": {
+            
+            }
+        }
+    }
+}

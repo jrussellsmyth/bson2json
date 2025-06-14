@@ -1,0 +1,9 @@
+# Ignore binaries and test files
+*.exe
+*.bin
+*.out
+*.test
+*.bson
+*.gz
+*.json
+testdata.*
