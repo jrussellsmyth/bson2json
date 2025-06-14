@@ -18,6 +18,7 @@ jobs:
 
       - name: Build binaries
         run: |
+          pwd
           mkdir -p dist
           GOOS=linux GOARCH=amd64 go build cmd -o dist/bson2json-linux-amd64
           GOOS=darwin GOARCH=amd64 go build cmd -o dist/bson2json-darwin-amd64
