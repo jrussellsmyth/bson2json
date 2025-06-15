@@ -1,8 +1,8 @@
 package main
 
 import (
-	"os"
 	"go.mongodb.org/mongo-driver/bson"
+	"os"
 )
 
 func main() {
@@ -15,11 +15,13 @@ func main() {
 		panic(err)
 	}
 	defer f.Close()
-	for _, doc := range docs {
-		b, err := bson.Marshal(doc)
-		if err != nil {
-			panic(err)
+	for i := 0; i < 1000; i++ {
+		for _, doc := range docs {
+			b, err := bson.Marshal(doc)
+			if err != nil {
+				panic(err)
+			}
+			f.Write(b)
 		}
-		f.Write(b)
 	}
 }
