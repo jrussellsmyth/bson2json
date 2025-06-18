@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"compress/gzip"
 	"encoding/json"
 	"flag"
@@ -28,7 +29,7 @@ func main() {
 	}
 	defer file.Close()
 
-	var reader io.Reader = file
+	var reader io.Reader = bufio.NewReader(file)
 	if strings.HasSuffix(*inputPath, ".gz") {
 		gz, err := gzip.NewReader(file)
 		if err != nil {
@@ -36,7 +37,7 @@ func main() {
 			os.Exit(1)
 		}
 		defer gz.Close()
-		reader = gz
+		reader = bufio.NewReader(gz)
 	}
 
 	enc := json.NewEncoder(os.Stdout)
