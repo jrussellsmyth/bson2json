@@ -4,49 +4,65 @@ import (
 	"bufio"
 	"compress/gzip"
 	"encoding/json"
-	"flag"
 	"fmt"
 	"io"
 	"os"
-	"strings"
 
 	"go.mongodb.org/mongo-driver/bson"
 )
 
+func isGzipHeader(header []byte) bool {
+	return len(header) >= 2 && header[0] == 0x1f && header[1] == 0x8b
+}
+
 func main() {
-	inputPath := flag.String("input", "", "Path to the BSON file (optionally .gz)")
-	flag.Parse()
+	var input io.Reader
+	var closer func()
 
-	if *inputPath == "" {
-		fmt.Fprintln(os.Stderr, "Error: --input flag is required")
+	if len(os.Args) > 1 && os.Args[1] != "-" {
+		file, err := os.Open(os.Args[1])
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Failed to open file: %v\n", err)
+			os.Exit(1)
+		}
+		closer = func() { file.Close() }
+		input = file
+	} else {
+		input = os.Stdin
+	}
+
+	bufr := bufio.NewReader(input)
+	header, err := bufr.Peek(2)
+	if err != nil && err != io.EOF {
+		fmt.Fprintf(os.Stderr, "Failed to peek input: %v\n", err)
 		os.Exit(1)
 	}
 
-	file, err := os.Open(*inputPath)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to open file: %v\n", err)
-		os.Exit(1)
-	}
-	defer file.Close()
-
-	var reader io.Reader = bufio.NewReader(file)
-	if strings.HasSuffix(*inputPath, ".gz") {
-		gz, err := gzip.NewReader(file)
+	var reader io.Reader
+	if isGzipHeader(header) {
+		gz, err := gzip.NewReader(bufr)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Failed to create gzip reader: %v\n", err)
+			if closer != nil {
+				closer()
+			}
 			os.Exit(1)
 		}
 		defer gz.Close()
 		reader = bufio.NewReader(gz)
+	} else {
+		reader = bufr
+	}
+	if closer != nil {
+		defer closer()
 	}
 
 	enc := json.NewEncoder(os.Stdout)
-	enc.SetIndent("", "  ")
+	enc.SetIndent("", "  ")	
 
 	fmt.Print("[")
 	first := true
 	for {
-		// Read the length of the next BSON document (first 4 bytes)
 		lenBuf := make([]byte, 4)
 		_, err := io.ReadFull(reader, lenBuf)
 		if err == io.EOF {
