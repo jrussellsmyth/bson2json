@@ -5,19 +5,43 @@ A simple command-line tool to convert BSON files (optionally gzip-compressed) to
 ## Usage
 
 ```
-go run cmd/bson2json/main.go --input <input.bson|input.bson.gz>
+# Convert a file
+bson2json <input.bson|input.bson.gz>
+
+# Or pipe data from stdin
+cat input.bson | bson2json
+cat input.bson.gz | bson2json
 ```
 
-## Build for Mac (Apple Silicon)
+## Build Instructions
+
+This project uses [go-task](https://taskfile.dev) for builds. Install it with:
 
 ```
-GOOS=darwin GOARCH=arm64 go build -o bson2json-macos-arm64 ./cmd/bson2json
+curl -sL https://taskfile.dev/install.sh | sh
+```
+
+### Build for current platform
+```
+task build
+```
+
+### Build for all major platforms (outputs in `bin/`):
+```
+task build-all
+```
+
+### Clean build artifacts
+```
+task clean
 ```
 
 ## Features
 - Supports BSON files and gzip-compressed BSON files
+- Auto-detects gzip by file content, not extension
+- Accepts input from a file or stdin
 - Outputs JSON to stdout
-
+- Multi-platform builds (Linux, macOS, Windows, Intel & ARM)
 
 ## License
 MIT
